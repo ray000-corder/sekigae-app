@@ -1,29 +1,31 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState } from "react";
+import apiClient from "../api/axiosConfig";
+import { useNavigate, Link } from "react-router-dom";
 
 function LoginPage() {
   // ... (handleLoginなどの関数は変更なし) ...
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+      // ↓ axios.post を apiClient.post に変更し、URLを相対パスにする
+      const response = await apiClient.post("/token/", {
         username: username,
         password: password,
       });
-      localStorage.setItem('access_token', response.data.access);
-      localStorage.setItem('refresh_token', response.data.refresh);
-      navigate('/');
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
+      navigate("/");
     } catch (error) {
-      console.error('ログインエラー:', error);
-      alert('ログインに失敗しました。ユーザー名かパスワードを確認してください。');
+      console.error("ログインエラー:", error);
+      alert(
+        "ログインに失敗しました。ユーザー名かパスワードを確認してください。"
+      );
     }
   };
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -32,7 +34,9 @@ function LoginPage() {
         <form onSubmit={handleLogin}>
           {/* ... (フォームの中身は変更なし) ... */}
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2" htmlFor="username">ユーザー名</label>
+            <label className="block text-gray-700 mb-2" htmlFor="username">
+              ユーザー名
+            </label>
             <input
               type="text"
               id="username"
@@ -43,7 +47,9 @@ function LoginPage() {
             />
           </div>
           <div className="mb-6">
-            <label className="block text-gray-700 mb-2" htmlFor="password">パスワード</label>
+            <label className="block text-gray-700 mb-2" htmlFor="password">
+              パスワード
+            </label>
             <input
               type="password"
               id="password"
@@ -62,7 +68,10 @@ function LoginPage() {
         </form>
         <div className="text-center mt-4">
           <p className="text-sm">
-            アカウントをお持ちでないですか？ <Link to="/register" className="text-indigo-500 hover:underline">新規登録</Link>
+            アカウントをお持ちでないですか？{" "}
+            <Link to="/register" className="text-indigo-500 hover:underline">
+              新規登録
+            </Link>
           </p>
         </div>
       </div>
