@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://sekigae-backend.onrender.com',
+  baseURL: 'https://sekigae-backend.onrender.com/api',
 });
 
 apiClient.interceptors.request.use(async (config) => {
