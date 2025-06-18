@@ -6,6 +6,7 @@ def create_initial_data(apps, schema_editor):
     if 'RENDER' in os.environ:
         User = apps.get_model('auth', 'User')
         SeatLayout = apps.get_model('seating', 'SeatLayout')
+        Seat = apps.get_model('seating', 'Seat') 
 
         # ↓↓↓【最重要】あなた自身の本番用アカウント情報に必ず変更してください ↓↓↓
         ADMIN_USERNAME = 'ray-admin'  # 例: あなたのユーザー名
@@ -25,7 +26,7 @@ def create_initial_data(apps, schema_editor):
             # 作成した管理者ユーザーに、デフォルトの座席表を作成
             if not SeatLayout.objects.filter(user=admin_user).exists():
                 print(f"Creating default seat layout for {ADMIN_USERNAME}")
-                 seat_layout = SeatLayout.objects.create(
+                seat_layout = SeatLayout.objects.create(
                     user=admin_user,
                     name=f"{ADMIN_USERNAME}の最初の座席表",
                     rows=6,
