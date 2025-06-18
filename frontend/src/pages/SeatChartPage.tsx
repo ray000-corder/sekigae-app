@@ -23,20 +23,14 @@ function SeatChartPage() {
     } catch (error) { console.error('座席表データの取得に失敗しました:', error); }
   }, []);
 
+  // ↓ コメントアウトを解除して、自動読み込みを復活させます
   useEffect(() => {
     fetchSeatLayout();
   }, [fetchSeatLayout]);
 
-  // ↓ ここから、各関数を一度だけ、正しく定義します。
-  
   const handleShuffle = async () => {
-    if (!seatLayout) {
-      alert('座席表が読み込まれていません。');
-      return;
-    }
-    if (!window.confirm('席替えを実行しますか？現在の座席情報はリセットされます。')) {
-      return;
-    }
+    if (!seatLayout) return;
+    if (!window.confirm('席替えを実行しますか？')) return;
     try {
       const response = await apiClient.post(`/seat-layouts/${seatLayout.id}/shuffle/`);
       setSeatLayout(response.data);
@@ -61,10 +55,7 @@ function SeatChartPage() {
     e.preventDefault();
     if (!seatLayout) return;
     try {
-      await apiClient.patch(`/seat-layouts/${seatLayout.id}/`, {
-        rows: editRows,
-        cols: editCols,
-      });
+      await apiClient.patch(`/seat-layouts/${seatLayout.id}/`, { rows: editRows, cols: editCols });
       fetchSeatLayout();
       alert('レイアウトを更新しました！');
     } catch (error) {
@@ -78,6 +69,7 @@ function SeatChartPage() {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">座席表</h2>
+          {/* ↓ 更新ボタンは不要になったので削除しました */}
           <button onClick={handleShuffle} className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">席替え実行！</button>
         </div>
         <SeatGrid layout={seatLayout} onSeatClick={handleSeatClick} />
