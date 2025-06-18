@@ -1,9 +1,10 @@
+# apps.py
 from django.apps import AppConfig
 
 
 class SeatingConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'seating'
+    name = 'backend.seating'  # ← フルパスに変更
 
     def ready(self):
-        import seating.signals # signals.pyをインポート
+        from backend.seating import signals  # ← 安全な書き方
