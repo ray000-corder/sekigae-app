@@ -12,13 +12,13 @@ IS_RENDER = 'RENDER' in os.environ
 
 if IS_RENDER:
     # --- 本番環境 (Render) の設定 ---
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key-that-is-not-very-secret')
     DEBUG = False
     # Renderが提供するホスト名を許可
     ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME')]
 else:
     # --- 開発環境 (ローカル) の設定 ---
-    SECRET_KEY = 'django-insecure-YOUR-LOCAL-SECRET-KEY' # 開発用の仮のキー
+    SECRET_KEY = 'django-insecure-your-dev-secret-key-for-local-development'
     DEBUG = True
     ALLOWED_HOSTS = []
 
@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic', # WhiteNoiseを追加
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'seating.apps.SeatingConfig',
     'rest_framework',
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # WhiteNoiseを追加
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,6 +51,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -66,6 +67,7 @@ TEMPLATES = [
         },
     },
 ]
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
@@ -87,10 +89,23 @@ else:
         }
     }
 
+# Password validation
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
-# Password validation, Internationalization, Static files (Timezone) ...
-# ... (この辺りの設定は変更なし) ...
-AUTH_PASSWORD_VALIDATORS = [ ... ]
+# Internationalization
 LANGUAGE_CODE = 'ja'
 TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
@@ -107,23 +122,31 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# --- 追加した設定 ---
+# --- ここからカスタム設定 ---
+
+# CORS設定
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
-# Renderのデプロイプレビューなども許可する場合
+
 if IS_RENDER:
-    CORS_ALLOWED_ORIGINS.append(f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}")
-    # RenderのデプロイプレビューURLなども許可する
-    CORS_ALLOW_ALL_ORIGINS = False
+
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r"^https://.*\.onrender\.com$",
     ]
-else:
-    CORS_ALLOW_ALL_ORIGINS = False
 
 
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "origin",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+# REST Framework設定
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
