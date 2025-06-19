@@ -23,7 +23,7 @@ function SeatChartPage() {
     } catch (error) { console.error('座席表データの取得に失敗しました:', error); }
   }, []);
 
-  // ↓ コメントアウトを解除して、自動読み込みを復活させます
+  
   useEffect(() => {
     fetchSeatLayout();
   }, [fetchSeatLayout]);
@@ -69,7 +69,7 @@ function SeatChartPage() {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">座席表</h2>
-          {/* ↓ 更新ボタンは不要になったので削除しました */}
+          {/* ↓ デバッグ用の「更新」ボタンは不要になったので削除しました */}
           <button onClick={handleShuffle} className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">席替え実行！</button>
         </div>
         <SeatGrid layout={seatLayout} onSeatClick={handleSeatClick} />
