@@ -1,29 +1,24 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# --- 基本設定 ---
 
-# Render上で実行されているかを環境変数で判定
+BASE_DIR = Path(__file__).resolve().parent.parent
 IS_RENDER = 'RENDER' in os.environ
 
-# --- ここから設定を切り替えます ---
-
 if IS_RENDER:
-    # --- 本番環境 (Render) の設定 ---
     SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key-that-is-not-very-secret')
     DEBUG = False
-    # Renderが提供するホスト名を許可
     ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME')]
 else:
-    # --- 開発環境 (ローカル) の設定 ---
     SECRET_KEY = 'django-insecure-your-dev-secret-key-for-local-development'
     DEBUG = True
     ALLOWED_HOSTS = []
 
+# --- アプリ設定 ---
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -70,10 +65,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# --- データベース設定 ---
 
-# Database
 if IS_RENDER:
-    # --- 本番環境 (Render) の設定 ---
     DATABASES = {
         'default': dj_database_url.config(
             conn_max_age=600,
@@ -81,7 +75,6 @@ if IS_RENDER:
         )
     }
 else:
-    # --- 開発環境 (ローカル) の設定 ---
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -89,7 +82,8 @@ else:
         }
     }
 
-# Password validation
+# --- パスワードバリデーション ---
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -105,36 +99,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
+# --- 国際化 ---
+
 LANGUAGE_CODE = 'ja'
 TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
 USE_TZ = True
 
+# --- 静的ファイル ---
 
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# --- CORS設定 ---
 
-# --- ここからカスタム設定 ---
 
-# CORS設定
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://sekigae-frontend.onrender.com",
 ]
-
-if IS_RENDER:
-
-    CORS_ALLOWED_ORIGIN_REGEXES = [
-        r"^https://.*\.onrender\.com$",
-    ]
 
 
 CORS_ALLOW_HEADERS = [
@@ -146,9 +133,18 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-# REST Framework設定
+# --- REST Framework + JWT設定 ---
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+}
+
+SIMPLE_JWT = {
+    'SIGNING_KEY': os.environ.get('JWT_SECRET_KEY', SECRET_KEY),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
