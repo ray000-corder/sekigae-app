@@ -14,16 +14,35 @@ function SeatChartPage() {
   const fetchSeatLayout = useCallback(async () => {
     try {
       const response = await apiClient.get('/seat-layouts/');
+      
       if (response.data && response.data.length > 0) {
+        // 座席表がすでにあれば、それを表示
         const layoutData = response.data[0];
         setSeatLayout(layoutData);
         setEditRows(layoutData.rows);
         setEditCols(layoutData.cols);
+      } else {
+        // ↓↓↓ ここからが新しいロジック ↓↓↓
+        // 座席表が一つもなかった場合、新しいデフォルトの座席表を作成する
+        console.log("座席表が見つからないため、新しいものを作成します。");
+        const createResponse = await apiClient.post('/seat-layouts/', {
+          name: "最初の座席表",
+          rows: 6,
+          cols: 5
+        });
+        // 作成された新しい座席表をstateにセット
+        const newLayoutData = createResponse.data;
+        setSeatLayout(newLayoutData);
+        setEditRows(newLayoutData.rows);
+        setEditCols(newLayoutData.cols);
+        // ↑↑↑ ここまでが新しいロジック ↑↑↑
       }
-    } catch (error) { console.error('座席表データの取得に失敗しました:', error); }
+    } catch (error) {
+      console.error('座席表データの取得または作成に失敗しました:', error);
+    }
   }, []);
 
-  
+
   useEffect(() => {
     fetchSeatLayout();
   }, [fetchSeatLayout]);
